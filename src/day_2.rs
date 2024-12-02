@@ -19,7 +19,7 @@ pub fn part_1() -> usize {
                     .try_fold(None, |acc, nums| {
                         let increasing = nums[0] < nums[1];
                         let diff = nums[0].abs_diff(nums[1]);
-                        if acc.is_some_and(|x| x != increasing) || diff > 3 || diff == 0 {
+                        if acc.is_some_and(|x| x != increasing) || !matches!(diff, 1..=3) {
                             return ControlFlow::Break(acc);
                         }
                         ControlFlow::Continue(Some(increasing))
@@ -39,25 +39,21 @@ pub fn part_2() -> usize {
                 .split_ascii_whitespace()
                 .map(|num| num.parse().unwrap())
                 .collect::<Vec<i32>>();
-            for i in 0..arr.len() {
-                if matches!(
+            (0..arr.len())
+                .map(|i| {
                     [&arr[0..i], &arr[i + 1..]]
                         .concat()
                         .windows(2)
                         .try_fold(None, |acc, nums| {
                             let increasing = nums[0] < nums[1];
                             let diff = nums[0].abs_diff(nums[1]);
-                            if acc.is_some_and(|x| x != increasing) || diff > 3 || diff == 0 {
+                            if acc.is_some_and(|x| x != increasing) || !matches!(diff, 1..=3) {
                                 return ControlFlow::Break(acc);
                             }
                             ControlFlow::Continue(Some(increasing))
-                        }),
-                    ControlFlow::Continue(_)
-                ) {
-                    return true;
-                }
-            }
-            false
+                        })
+                })
+                .any(|arr| matches!(arr, ControlFlow::Continue(_)))
         })
         .count()
 }
